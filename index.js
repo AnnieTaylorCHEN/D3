@@ -64,7 +64,12 @@ const svg = d3.select('.canvas')
             .attr('transform', `translate(0, ${graphHeight})`)
         const yAxisGroup = graph.append('g')
 
-d3.json('menu.json').then(data => {
+db.collection('dishes').get().then(res => {
+
+    let data = []
+    res.docs.forEach( doc => {
+        data.push(doc.data())
+    })
 
     //scale is to keep the height in proportion
     const y = d3.scaleLinear()
