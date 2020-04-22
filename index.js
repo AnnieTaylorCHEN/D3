@@ -84,6 +84,9 @@ const yAxis = d3
   .ticks(3)
   .tickFormat((d) => d + ' orders')
 
+//store transition value
+const t = d3.transition().duration(1500)
+
 // update function
 const update = (data) => {
   y.domain([0, d3.max(data, (d) => d.orders)])
@@ -98,19 +101,25 @@ const update = (data) => {
   //update the current shapes in the DOM
   rects
     .attr('width', x.bandwidth)
-    .attr('height', (d) => graphHeight - y(d.orders))
     .attr('fill', 'darkgreen')
     .attr('x', (d) => x(d.name))
-    .attr('y', (d) => y(d.orders))
+    // .transition(t)
+    // .attr('height', (d) => graphHeight - y(d.orders))
+    // .attr('y', (d) => y(d.orders))
 
   //append the enter selection to the DOM
   rects
     .enter()
     .append('rect')
-    .attr('width', x.bandwidth)
-    .attr('height', (d) => graphHeight - y(d.orders))
+    .attr('width', 0)
+    .attr('height', 0)
+    .attr('y', graphHeight)
     .attr('fill', 'darkgreen')
     .attr('x', (d) => x(d.name))
+    .merge(rects)
+    .transition(t)
+    .attrTween('width', widthTween)
+    .attr('height', (d) => graphHeight - y(d.orders))
     .attr('y', (d) => y(d.orders))
 
   //call axes
@@ -153,3 +162,16 @@ db.collection('dishes').onSnapshot((res) => {
   })
   update(data)
 })
+
+//Tweens
+
+const widthTween = (d) => {
+    //define interpolation 
+    //d3.interpolate returns a function which we call i
+    let i = d3.interpolate(0, x.bandwidth())
+    //returns a function which takes in a time tikcer 't'
+    return function(t) {
+        //return the value from passing the ticker into the interpolation
+        return i(t)
+    }
+}
