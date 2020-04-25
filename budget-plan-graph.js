@@ -156,7 +156,6 @@ const handleMouseOut = (d, i, n) => {
     .transition('changeSliceFill')
     .duration(300)
     .attr('fill', color(d.data.name))
-    console.log('fired')
 }
 
 const handleClick = (d) => {
